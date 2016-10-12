@@ -7,6 +7,7 @@
 #	delete /usr/local/lib/java
 #	delete /usr/lib/jvm
 #	delete /etc/alternatives 中所有的 java 链接
+#	重启生效
 # @Author:
 #	codergege
 # @Last Update:
@@ -14,9 +15,6 @@
 # @usage:
 #	bash uninstall_java.sh
 
-# 只在当前脚本生效, 脚本执行完毕后, 父 shell 中还是原来的 PATH
-PATH=$PATH:~/bin
-export PATH
 # path
 home=/home/codergege
 env=/etc/environment

@@ -27,7 +27,7 @@ pkgDir=$home/develop/installation
 # 安装目录
 installDir=/usr/local/lib/java
 # config
-config=/etc/environment
+config=/etc/profile
 # 保存当前目录
 pwdDir=$pwd
 
@@ -92,13 +92,9 @@ sudo tar -xvf $pkg -C $installDir
 # 将 java 环境变量写入 $config 的函数
 function set_java_env() {
 	sudo sed -i '$a # Set java environment JAVA_HOME' $config
-	echo "JAVA_HOME=$jdk" | sudo tee -a $config
-	sudo sed -i '$a export JAVA_HOME' $config
-	sudo sed -i '$a CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' $config
-	sudo sed -i '$a export CLASSPATH #JAVA_HOME' $config
-	sudo sed -i '$a PATH=$PATH:$JAVA_HOME/bin' $config
-	sudo sed -i '$a export PATH #JAVA_HOME' $config
-	source $config
+	echo "export JAVA_HOME=$jdk" | sudo tee -a $config
+	sudo sed -i '$a export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' $config
+	sudo sed -i '$a export PATH=$PATH:$JAVA_HOME/bin' $config
 }
 
 # set java environment
@@ -113,5 +109,6 @@ else
 fi
 
 cd $pwdDir
+source $config
 echo "========> $jdk installed"
 
