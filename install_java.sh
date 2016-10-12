@@ -2,7 +2,7 @@
 # @file: 
 #	install_java.sh
 # @desc:
-#	如果要安装的 java 版本改变, 脚本中的一些设置也需要改变(java7已经稳定, 一般不会变了): pkg, untar, url
+#	如果要安装的 java 版本改变, 脚本中的一些设置也需要改变(java7已经稳定, 一般不会变了): pkg, jdk, url
 #	Install java.
 #	7u80的版本链接 otn 改成 otn-pub
 #	1. 判断是否安装了 jdk 
@@ -14,7 +14,7 @@
 # @Author:
 #	codergege
 # @Last Update:
-#	2016-10-11
+#	2016-10-12
 # @usage:
 #	为了使 souce $config 生效, 要用 source 命令执行
 #	source install_java.sh java7 32
@@ -102,7 +102,7 @@ if ! grep "JAVA_HOME" $config; then
 	echo "设置 java environment"
 	set_java_env
 else
-	echo "$env 中已存在 JAVA_HOME, 将删除原设置, 并重新设置"
+	echo "$config 中已存在 JAVA_HOME, 将删除原设置, 并重新设置"
 	# 如果已经有了设置, 先删除再写入
 	sudo sed -i '/JAVA_HOME/d' $config
 	set_java_env

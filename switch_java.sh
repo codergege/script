@@ -9,7 +9,8 @@
 # @Last Update:
 #	2016-10-11
 # @usage:
-#	source switch.sh
+#	source switch_java.sh java7
+#	source switch_java.sh java8
 
 # path
 home=/home/codergege
@@ -33,12 +34,14 @@ sudo sed -i '/JAVA_HOME/d' $config
 # 将 java 环境变量写入 $config 的函数
 function set_java_env() {
 	    sudo sed -i '$a # Set java environment JAVA_HOME' $config
-			    echo "export JAVA_HOME=$jdk" | sudo tee -a $config
-				    sudo sed -i '$a export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' $config
-					    sudo sed -i '$a export PATH=$PATH:$JAVA_HOME/bin' $config
+		echo "export JAVA_HOME=$jdk" | sudo tee -a $config
+		sudo sed -i '$a export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' $config
+		sudo sed -i '$a export PATH=$PATH:$JAVA_HOME/bin' $config
 }
 
 set_java_env
+
+source $config
 
 echo "Java 版本切换成功."
 echo "现在 java 版本为 $jdk"
