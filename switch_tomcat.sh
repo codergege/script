@@ -17,7 +17,7 @@
 pwdDir=$pwd
 home=/home/codergege
 config=/etc/profile
-installDir=/usr/local/lib/tomcat
+installDir=/usr/local/tomcat
 tomcat7=apache-tomcat-7.0.72
 tomcat8=apache-tomcat-8.5.6
 

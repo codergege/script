@@ -25,7 +25,7 @@ home=/home/codergege
 # 安装包目录
 pkgDir=$home/develop/installation
 # 安装目录
-installDir=/usr/local/lib/java
+installDir=/usr/local/java
 # config
 config=/etc/profile
 # 保存当前目录

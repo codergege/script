@@ -13,10 +13,11 @@
 # @Last Update:
 #	2016-10-11
 # @usage:
-#	bash uninstall_java.sh
+#	source uninstall_java.sh
 
 # path
 home=/home/codergege
+pwdDir=$pwd
 env=/etc/environment
 bashrc=$home/.bashrc
 profile=/etc/profile
@@ -38,9 +39,9 @@ if [ -f "$userProfile" ]; then
 fi
 
 # 删除 /usr/local/lib/java, /usr/lib/jvm
-if [ -d "/usr/local/lib/java" ]; then
-	echo "Deleting /usr/local/lib/java"
-	sudo rm -rf /usr/local/lib/java
+if [ -d "/usr/local/java" ]; then
+	echo "Deleting /usr/local/java"
+	sudo rm -rf /usr/local/java
 fi
 if [ -d "/usr/lib/jvm" ]; then
 	echo "Deleting /usr/lib/jvm"
@@ -55,4 +56,5 @@ do
 	sudo rm -rf $link
 done
 
+cd $pwdDir
 echo "Uninstall java complete"

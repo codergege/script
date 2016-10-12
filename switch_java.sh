@@ -15,8 +15,8 @@
 # path
 home=/home/codergege
 config=/etc/profile
-java7=/usr/local/lib/java/jdk1.7.0_80
-java8=/usr/local/lib/java/jdk1.8.0_101
+java7=/usr/local/java/jdk1.7.0_80
+java8=/usr/local/java/jdk1.8.0_101
 
 if [ $1 == "java7" ]; then
 	jdk=$java7

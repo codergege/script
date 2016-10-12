@@ -4,10 +4,10 @@
 # @desc:
 #	如果要安装的 tomcat 版本改变, 脚本中的一些设置也需要改变
 #	1. 判断是否安装了 tomcat 
-#		通过 /usr/local/lib/tomcat 文件夹是否存在来判断; 如果存在, echo, exit
+#		通过 /usr/local/tomcat 文件夹是否存在来判断; 如果存在, echo, exit
 #		通过判断 $config 中是否存在 TOMCAT_HOME ; 如果存在, echo, exit
 #	2. 判断 $home/develop/installation 下是否有对应的包下载好了, 如果没有, 就 wget 到该目录下
-#	3. 解压缩到 /usr/local/lib/tomcat 下
+#	3. 解压缩到 /usr/local/tomcat 下
 #	4. 配置环境变量
 #		重要的一步是往 setclasspath.sh 中写入 JAVA_HOME, 否则 tomcat 找不到
 #	5. 在 /usr/local/bin 中建立 link
@@ -27,7 +27,7 @@ home=/home/codergege
 # 安装包目录
 pkgDir=$home/develop/installation
 # 安装目录
-installDir=/usr/local/lib/tomcat
+installDir=/usr/local/tomcat
 # config
 config=/etc/profile
 # 保存当前目录
