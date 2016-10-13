@@ -157,7 +157,6 @@ else
 fi
 
 # mysqld
-# 妈的, 不起作用
 sed -i 's#^basedir=$#basedir='${mysql}'#' /etc/init.d/mysql
 sed -i 's#^datadir=$#datadir='${dataDir}/data'#' /etc/init.d/mysql
 # 会失败, 没关系
@@ -165,7 +164,7 @@ sed -i 's#^datadir=$#datadir='${dataDir}/data'#' /etc/init.d/mysql
 systemctl daemon-reload
 
 rm $dataDir/data/*
-$mysql/bin/mysqld --defaults-file=/etc/my.cnf --user=mysql --initialize
+$mysql/bin/mysqld --defaults-file=/etc/my.cnf --user=mysql --initialize-insecure
 
 source $config
 cd $pwdDir
