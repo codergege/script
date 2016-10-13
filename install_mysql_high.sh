@@ -6,7 +6,7 @@
 #	1. 判断是否安装了 mysql, 是否存在用户 mysql
 #		通过 /usr/local/mysql 文件夹是否存在来判断; 如果存在, echo, exit
 #	2. 判断 $home/develop/installation 下是否有对应的包下载好了, 如果没有, 就 wget 到该目录下
-#	3. 解压缩到 /usr/local/mysql 下
+#	3. 解压缩到 /usr/local/下
 # @Author:
 #	codergege
 # @Last Update:
@@ -20,18 +20,19 @@ home=/home/codergege
 # 安装包目录
 pkgDir=$home/develop/installation
 # 安装目录
-installDir=/usr/local/mysql
+installDir=/usr/local
 # config
 config=/etc/profile
 # 保存当前目录
 pwdDir=$pwd
 # mysql 
+dataDir=/var/lib/mysql
 url64=http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar
 pkg64=$pkgDir/mysql-5.7.15-linux-glibc2.5-x86_64.tar
-##mysql64=
+mysql64=mysql-5.7.15-linux-glibc2.5-x86_64
 url32=http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-i686.tar
 pkg32=mysql-5.7.15-linux-glibc2.5-i686.tar
-#mysql32=
+mysql32=mysql-5.7.15-linux-glibc2.5-i686
 
 # 检查输入参数
 if [ $1 == "64" ] || [ $1 == "32" ]; then
@@ -45,12 +46,12 @@ fi
 if [ $1 == "64" ] ; then
 	pkg=$pkg64
 	url=$url64
-#	tomcat=$installDir/$tomcat7
+	mysql=$installDir/$mysql64
 fi
 if [ $1 == "32" ]; then
 	pkg=$pkg32
 	url=$url32
-#	tomcat=$installDir/$tomcat8
+	mysql=$installDir/$mysql32
 fi
 
 # 判断安装包是否存在
@@ -62,62 +63,103 @@ else
 	wget -P $pkgDir $url
 fi
 
-## 判断安装目录是否存在
+#判断是否有 mysql 账号
+acount=$(cat /etc/passwd | grep 'mysql' | cut -c 1-5)
+if [ account != "mysql" ]; then
+	echo "Not account mysql exists. Creating the account."
+	sudo groupadd mysql
+	sudo useradd -r -g mysql -s /bin/false mysql
+fi
+
+# 判断安装目录是否存在
 #if [ ! -d "$installDir" ]; then
 #	sudo mkdir -p $installDir
 #fi
+
+# 解压到安装目录
+## 第一层解压
+if [ ! -f $pkg.gz ];then
+	tar -xvf $pkg -C $pkgDir
+fi
+pkg=$pkg.gz
+## 第二层, 解压到安装目录
+if [ -d "$mysql" ]; then
+sudo rm -rf $mysql
+fi
+sudo tar -zxvf $pkg -C $installDir
+
+# 创建 link 
+cd $installDir
+sudo rm -f /usr/local/mysql
+sudo ln -s $mysql mysql
+mysql=$installDir/mysql
+
+# create mysql-file, chmod
+cd mysql
+sudo mkdir mysql-files
+sudo mkdir -p $dataDir/data
+sudo chmod 750 mysql-files
+sudo chown -R mysql .
+sudo chgrp -R mysql .
+sudo chown -R mysql $dataDir
+sudo chgrp -R mysql $dataDir
+
+# my.cnf, mysql.server
+# mysql 启动方式为 mysql.server start, stop
+sudo rm -f /etc/my.cnf
+sudo cp -a $home/StudyNote/config/mysql/mysql_high_my.cnf /etc/my.cnf
+sudo cp -a support-files/mysql.server bin/mysql.server
+sudo chown mysql /etc/my.cnf
+sudo chgrp mysql /etc/my.cnf
+
+# 加入 /etc/init.d 使开机启动
+sudo rm -f /etc/init.d/mysql
+sudo cp -a support-files/mysql.server /etc/init.d/mysql
+#sudo chkconfig --add mysql
+#sudo chkconfig --level 345 mysql on
+# ubuntu 中使用如下命令
+cd /etc/init.d
+sudo update-rc.d mysql defaults 345
+# 卸载使用如下命令
+#cd /etc/init.d
+#sudo update-rc.d -f mysql remove
+
+# mysqld
+cd $mysql
+sudo bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
+
+# 将 /usr/local/mysql/bin 加入 PATH
+function set_mysql_env() {
+	sudo sed -i '$a # Set mysql environment MYSQL_HOME' $config
+	echo "export MYSQL_HOME=$mysql" | sudo tee -a $config
+	sudo sed -i '$a export PATH=$PATH:$MYSQL_HOME/bin' $config
+}
+
+# 删除 $config 文件中的 mysql 设置 
+function remove_mysql_env() {
+	sudo sed -i '/MYSQL_HOME/d' $config
+}
+
+# set mysql environment
+if ! grep "MYSQL_HOME" $config; then
+	echo "设置 mysql environment"
+	set_mysql_env
+else
+	echo "$config 中已存在 MYSQL_HOME, 将删除原设置, 并重新设置"
+	# 如果已经有了设置, 先删除再写入
+	remove_mysql_env
+	set_mysql_env
+fi
+
+cd $pwdDir
+source $config
+echo "========> mysql installed"
+
 #
-## 解压到安装目录
-#if [ -d "$tomcat" ]; then
-#sudo rm -rf $tomcat
-#fi
-#sudo tar -xvf $pkg -C $installDir
-#
-## 创建 link 
-#cd /usr/local/bin
-#sudo rm -f /usr/local/bin/startup
-#sudo rm -f /usr/local/bin/tshutdown
-#sudo ln -s $tomcat/bin/startup.sh startup
-#sudo ln -s $tomcat/bin/shutdown.sh tshutdown
-#
-## 将 tomcat 环境变量写入 $config 的函数
-#function set_tomcat_env() {
-#	sudo sed -i '$a # Set tomcat environment TOMCAT_HOME' $config
-#	echo "export TOMCAT_HOME=$tomcat" | sudo tee -a $config
-#	echo "export CATALINA_HOME=$tomcat" | sudo tee -a $config
-#	echo "export CATALINA_BASE=$tomcat" | sudo tee -a $config
-#	sudo sed -i '$a export PATH=$PATH:$TOMCAT_HOME/bin' $config
-#	# 如果 setclasspath 中没有写入, 那就写入
-#	setclasspath=$tomcat/bin/setclasspath.sh
-##	echo "======>$setclasspath"
-#	if ! sudo grep "javahome" $setclasspath; then
-#		javahome=$(cat $config | grep 'JAVA_HOME=' | awk 'BEGIN {FS="="} {print $2}')
-#		rm -f /tmp/script
-#		touch /tmp/script
-#		echo "export JAVA_HOME=$javahome #javahome" >> /tmp/script
-#		sudo sed -i '1r /tmp/script' $setclasspath
-#		rm -f /tmp/script
-#	fi
-#}
-#
-## 删除 $config 文件中的 tomcat 设置 
-#function remove_tomcat_env() {
-#	sudo sed -i '/TOMCAT_HOME/d' $config
-#	sudo sed -i '/CATALINA/d' $config
-#}
-#
-## set tomcat environment
-#if ! grep "TOMCAT_HOME" $config; then
-#	echo "设置 tomcat environment"
-#	set_tomcat_env
-#else
-#	echo "$config 中已存在 TOMCAT_HOME, 将删除原设置, 并重新设置"
-#	# 如果已经有了设置, 先删除再写入
-#	remove_tomcat_env
-#	set_tomcat_env
-#fi
-#
-#cd $pwdDir
-#source $config
-#echo "========> $tomcat installed"
-#
+#shell> bin/mysqld --initialize --user=mysql # MySQL 5.7.6 and up
+#shell> bin/mysql_ssl_rsa_setup              # MySQL 5.7.6 and up
+#shell> chown -R root .
+#shell> chown -R mysql data mysql-files
+#shell> bin/mysqld_safe --user=mysql &
+# Next command is optional
+#shell> cp support-files/mysql.server /etc/init.d/mysql.server
