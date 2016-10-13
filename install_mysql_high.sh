@@ -27,6 +27,8 @@ config=/etc/profile
 pwdDir=$pwd
 # mysql 
 dataDir=/var/lib/mysql
+socketfile=/var/tmp/mysql.sock
+logfile=/var/log/mysqld.log
 url64=http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar
 pkg64=$pkgDir/mysql-5.7.15-linux-glibc2.5-x86_64.tar
 mysql64=mysql-5.7.15-linux-glibc2.5-x86_64
@@ -67,13 +69,13 @@ fi
 acount=$(cat /etc/passwd | grep 'mysql' | cut -c 1-5)
 if [ account != "mysql" ]; then
 	echo "Not account mysql exists. Creating the account."
-	sudo groupadd mysql
-	sudo useradd -r -g mysql -s /bin/false mysql
+	 groupadd mysql
+	 useradd -r -g mysql -s /bin/false mysql
 fi
 
 # 判断安装目录是否存在
 #if [ ! -d "$installDir" ]; then
-#	sudo mkdir -p $installDir
+#	 mkdir -p $installDir
 #fi
 
 # 解压到安装目录
@@ -84,60 +86,63 @@ fi
 pkg=$pkg.gz
 ## 第二层, 解压到安装目录
 if [ -d "$mysql" ]; then
-sudo rm -rf $mysql
+ rm -rf $mysql
 fi
-sudo tar -zxvf $pkg -C $installDir
+ tar -zxvf $pkg -C $installDir
 
 # 创建 link 
 cd $installDir
-sudo rm -f /usr/local/mysql
-sudo ln -s $mysql mysql
+ rm -f /usr/local/mysql
+ ln -s $mysql mysql
 mysql=$installDir/mysql
 
 # create mysql-file, chmod
 cd mysql
-sudo mkdir mysql-files
-sudo mkdir -p $dataDir/data
-sudo chmod 750 mysql-files
-sudo chown -R mysql .
-sudo chgrp -R mysql .
-sudo chown -R mysql $dataDir
-sudo chgrp -R mysql $dataDir
+ mkdir mysql-files
+# 删除 $dataDir
+ rm -rf $dataDir
+ mkdir -p $dataDir/data
+ chmod 750 mysql-files
+ chown -R mysql .
+ chgrp -R mysql .
+ chown -R mysql $dataDir
+ chgrp -R mysql $dataDir
 
 # my.cnf, mysql.server
 # mysql 启动方式为 mysql.server start, stop
-sudo rm -f /etc/my.cnf
-sudo cp -a $home/StudyNote/config/mysql/mysql_high_my.cnf /etc/my.cnf
-sudo cp -a support-files/mysql.server bin/mysql.server
-sudo chown mysql /etc/my.cnf
-sudo chgrp mysql /etc/my.cnf
+ rm -f /etc/my.cnf
+ cp -a $home/StudyNote/config/mysql/mysql_high_my.cnf /etc/my.cnf
+ cp -a support-files/mysql.server bin/mysql.server
+ chown mysql /etc/my.cnf
+ chgrp mysql /etc/my.cnf
 
 # 加入 /etc/init.d 使开机启动
-sudo rm -f /etc/init.d/mysql
-sudo cp -a support-files/mysql.server /etc/init.d/mysql
-#sudo chkconfig --add mysql
-#sudo chkconfig --level 345 mysql on
+ rm -f /etc/init.d/mysql
+ cp -a support-files/mysql.server /etc/init.d/mysql
+
+# chkconfig --add mysql
+# chkconfig --level 345 mysql on
 # ubuntu 中使用如下命令
 cd /etc/init.d
-sudo update-rc.d mysql defaults 345
+ update-rc.d mysql defaults 345
 # 卸载使用如下命令
 #cd /etc/init.d
-#sudo update-rc.d -f mysql remove
+# update-rc.d -f mysql remove
 
-# mysqld
-cd $mysql
-sudo bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
+# 删除 sock, log
+rm -f $socketfile
+rm -f $logfile
 
 # 将 /usr/local/mysql/bin 加入 PATH
 function set_mysql_env() {
-	sudo sed -i '$a # Set mysql environment MYSQL_HOME' $config
-	echo "export MYSQL_HOME=$mysql" | sudo tee -a $config
-	sudo sed -i '$a export PATH=$PATH:$MYSQL_HOME/bin' $config
+	 sed -i '$a # Set mysql environment MYSQL_HOME' $config
+	echo "export MYSQL_HOME=$mysql" |  tee -a $config
+	 sed -i '$a export PATH=$PATH:$MYSQL_HOME/bin' $config
 }
 
 # 删除 $config 文件中的 mysql 设置 
 function remove_mysql_env() {
-	sudo sed -i '/MYSQL_HOME/d' $config
+	 sed -i '/MYSQL_HOME/d' $config
 }
 
 # set mysql environment
@@ -151,8 +156,19 @@ else
 	set_mysql_env
 fi
 
-cd $pwdDir
+# mysqld
+# 妈的, 不起作用
+sed -i 's#^basedir=$#basedir='${mysql}'#' /etc/init.d/mysql
+sed -i 's#^datadir=$#datadir='${dataDir}/data'#' /etc/init.d/mysql
+# 会失败, 没关系
+/etc/init.d/mysql start
+systemctl daemon-reload
+
+rm $dataDir/data/*
+$mysql/bin/mysqld --defaults-file=/etc/my.cnf --user=mysql --initialize
+
 source $config
+cd $pwdDir
 echo "========> mysql installed"
 
 #
