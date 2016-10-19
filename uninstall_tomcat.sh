@@ -33,8 +33,8 @@ if [ -d "/usr/local/tomcat" ]; then
 fi
 
 # 删除所有 /usr/local/bin 中的链接
-sudo rm -f /usr/local/bin/startup
-sudo rm -f /usr/local/bin/tshutdown
+sudo rm -f /usr/bin/startup
+sudo rm -f /usr/bin/tshutdown
 
 source $config
 echo "Uninstall tomcat complete"

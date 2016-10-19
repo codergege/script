@@ -81,9 +81,9 @@ fi
 sudo tar -xvf $pkg -C $installDir
 
 # 创建 link 
-cd /usr/local/bin
-sudo rm -f /usr/local/bin/startup
-sudo rm -f /usr/local/bin/tshutdown
+cd /usr/bin
+sudo rm -f /usr/bin/startup
+sudo rm -f /usr/bin/tshutdown
 sudo ln -s $tomcat/bin/startup.sh startup
 sudo ln -s $tomcat/bin/shutdown.sh tshutdown
 
