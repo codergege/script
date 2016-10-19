@@ -24,7 +24,7 @@ git add .
 
 # git commit -m 'datetime'
 datetime=$(date +%Y%m%d%H%M%S)
-git commit -m '$datetime'
+git commit -m $datetime
 
 # git push 
 git push origin master
