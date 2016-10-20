@@ -111,7 +111,7 @@ cd mysql
 # my.cnf, mysql.server
 # mysql 启动方式为 mysql.server start, stop
  rm -f /etc/my.cnf
- cp -a $home/StudyNote/config/mysql/mysql_high_my.cnf /etc/my.cnf
+ cp -a $home/vimwiki/knowledge/config/mysql/mysql_high_my.cnf.wiki /etc/my.cnf
  cp -a support-files/mysql.server bin/mysql.server
  chown mysql /etc/my.cnf
  chgrp mysql /etc/my.cnf
