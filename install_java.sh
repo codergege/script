@@ -5,16 +5,10 @@
 #	如果要安装的 java 版本改变, 脚本中的一些设置也需要改变(java7已经稳定, 一般不会变了): pkg, jdk, url
 #	Install java.
 #	7u80的版本链接 otn 改成 otn-pub
-#	1. 判断是否安装了 jdk 
-#		通过 /usr/local/lib/java 文件夹是否存在来判断; 如果存在, echo, exit
-#		通过判断 /etc/profile ~/.bashrc 中是否存在 JAVA_HOME ; 如果存在, echo, exit
-#	2. 判断 $home/develop/installation 下是否有对应的包下载好了, 如果没有, 就 wget 到该目录下
-#	3. 解压缩到 /usr/local/lib/java 下
-#	4. 配置环境变量
 # @Author:
 #	codergege
 # @Last Update:
-#	2016-10-12
+#	2016-10-29
 # @usage:
 #	为了使 souce $config 生效, 要用 source 命令执行
 #	source install_java.sh java7 32
