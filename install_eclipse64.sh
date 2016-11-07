@@ -17,18 +17,15 @@ home=/home/codergege
 # 安装包目录
 pkgDir=$home/develop/installation
 # 安装目录
-installDir=/opt/develop
+installDir=/usr/local
 # config
 config=/etc/profile
 # 保存当前目录
 pwdDir=$pwd
 # eclipse 
-url=http://mirrors.neusoft.edu.cn/eclipse/technology/epp/downloads/release/neon/1a/eclipse-java-neon-1a-linux-gtk-x86_64.tar.gz
-pkg=eclipse-java-neon-1a-linux-gtk-x86_64.tar.gz
+url=http://mirrors.neusoft.edu.cn/eclipse/technology/epp/downloads/release/neon/1a/eclipse-jee-neon-1a-linux-gtk-x86_64.tar.gz
+pkg=eclipse-jee-neon-1a-linux-gtk-x86_64.tar.gz
 eclipse=$installDir/eclipse
-
-sudo chgrp -r codergege $eclipse
-sudo chown -r codergege $eclipse
 
 # 判断安装包是否存在
 cd $pkgDir
@@ -55,6 +52,10 @@ sudo tar -xvf $pkg -C $installDir
 cd /usr/bin
 sudo rm -f /usr/bin/eclipse
 sudo ln -s $eclipse/eclipse eclipse
+
+cd ~
+rm -rf .vrapperrc
+ln -s .vim/.vrapperrc .vrapperrc
 
 cd $pwdDir
 echo "========> $eclipse installed"
