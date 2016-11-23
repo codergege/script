@@ -17,6 +17,8 @@
 home=/home/codergege
 # 安装包目录
 pkgDir=$home/develop/installation
+# api 目录
+apiDir=$home/develop/api-documentation
 # 安装目录
 installDir=/usr/local/gradle
 # config
@@ -31,14 +33,21 @@ gv=gradle-3.1
 
 # 判断安装包是否存在
 cd $pkgDir
+
 if [ -f "$pkg" ]; then
 	echo "找到本地安装包, 准备安装..."
 else
 	echo "未找到本地安装包, 准备下载..."
 	wget -P $pkgDir $url 
 fi
+
 if [ ! -d "$installDir" ]; then
 	sudo mkdir -p $installDir
+fi
+
+# 如果 apiDir 不存在, 就创建
+if [ ! -d "$apiDir" ]; then
+    mkdir -p $apiDir
 fi
 
 # 解压并 mv 到安装目录
@@ -51,7 +60,7 @@ dtrx -nov --one h $gv-all.zip
 sudo mv $pkgDir/$gv-all/$gv $installDir/
  
 # 创建 doc link 
-cd /home/codergege/api-documentation
+cd $apiDir
 sudo rm -f $gv
 sudo ln -s $gradle/docs $gv
 

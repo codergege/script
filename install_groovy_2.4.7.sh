@@ -24,6 +24,8 @@ home=/home/codergege
 pkgDir=$home/develop/installation/groovy
 # 安装目录
 installDir=/usr/local/groovy
+# api 目录
+apiDir=$home/develop/api-documentation
 # config
 config=/etc/profile
 # 保存当前目录
@@ -60,6 +62,11 @@ if [ ! -d "$installDir" ]; then
 	sudo mkdir -p $installDir
 fi
 
+# 如果 apiDir 不存在, 就创建
+if [ ! -d "$apiDir" ]; then
+    mkdir -p $apiDir
+fi
+
 # 解压到安装目录
 groovyname=groovy-2.4.7
 groovy=$installDir/$groovyname
@@ -71,6 +78,13 @@ unzip  $pkg
 #unzip  $docpkg
 cd $installDir
 sudo mv $pkgDir/$groovyname .
+
+# 将 docpkg 复制到 $apiDir
+cd $apiDir
+cp -a $pkgDir/$docpkg .
+unzip $docpkg
+rm $docpkg
+
 
 # 将 java 环境变量写入 $config 的函数
 function set_groovy_env() {

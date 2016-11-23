@@ -1,6 +1,6 @@
 #!/bin/bash
 # @file: 
-#	install_eclipse.sh
+#	install_eclipse32.sh
 # @desc:
 #	如果要安装的 eclipse 版本改变, 脚本中的一些设置也需要改变
 #   该 script 安装的是 eclipse for java 4.6.1 版本.
